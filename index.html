@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn English Morocco 🇲🇦</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial;background:#f4f6fb}
+.top{background:#0b5ed7;color:#fff;padding:18px;text-align:center;border-radius:0 0 20px 20px}
+.top h1{margin:0;font-size:22px}
+.wrap{padding:14px;padding-bottom:90px}
+.card{background:#fff;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.c{border-radius:16px;padding:16px;color:#fff;text-align:center;cursor:pointer;font-weight:bold}
+.green{background:#22b573}.purple{background:#8b5cf6}.yellow{background:#f5b301;color:#222}.blue{background:#0b5ed7}
+.progress{background:#e9ecef;height:10px;border-radius:20px;overflow:hidden}
+.progress div{background:#22b573;height:100%;width:65%}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:12px;border-top:1px solid #ddd;font-weight:bold}
+button{padding:12px 18px;border:none;border-radius:12px;background:#0b5ed7;color:#fff;font-size:16px;width:100%;cursor:pointer}
+.lesson{background:#fff3cd;padding:14px;border-radius:12px;margin-top:10px;font-size:18px;text-align:center}
+img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+</style>
+</head>
+<body>
+
+<div id="login" style="display:none;padding:30px 16px;text-align:center">
+<h2 style="color:#0b5ed7">Learn English Morocco 🇲🇦</h2>
+<p>تعلم الإنجليزية بطريقة ساهلة</p>
+<div class="card">
+<p>دخل بـ Gmail ديالك باش يبان ليك سميتك و التقدم ديالك</p>
+<button onclick="login()">دخل بـ Gmail 📧</button>
+<p id="err" style="color:red"></p>
+</div>
+</div>
+
+<div id="app" style="display:none">
+<div class="top"><h1>Learn English Morocco 🇲🇦</h1><p>تعلم • العب • تكلم</p></div>
+<div class="wrap">
+<div class="card" style="display:flex;align-items:center;gap:12px">
+<img id="photo" src="">
+<div><h2 id="hello" style="margin:0">أهلا!</h2><p id="email" style="margin:4px 0;color:#666;font-size:13px"></p>
+<div class="progress"><div></div></div><p>65% - 12 من 18 درس</p>
+<button onclick="logout()" style="background:#eee;color:#333;padding:8px">خروج</button></div>
+</div>
+
+<div class="grid">
+<div class="c green" onclick="show('Vocabulary • المفردات','Hello 👋 = السلام عليكم')">Vocabulary<br>المفردات</div>
+<div class="c purple" onclick="show('Grammar • القواعد','I am Yassine = أنا ياسين')">Grammar<br>القواعد</div>
+<div class="c yellow" onclick="show('Listening • الاستماع','اسمع و عاود: Hello, how are you?')">Listening<br>الاستماع</div>
+<div class="c blue" onclick="show('Speaking • المحادثة','قول: My name is ...')">Speaking<br>المحادثة</div>
+</div>
+
+<div id="lesson" class="lesson" style="display:none"></div>
+
+<div class="card"><h3>Quiz - اختبار سريع</h3><p>What is "Hello" in Arabic?</p>
+<button onclick="alert('صحيح! ✅')">السلام عليكم</button><br><br>
+<button onclick="alert('حاول عاود ❌')" style="background:#eee;color:#333">شكرا</button></div>
+</div>
+</div>
+
+<div class="nav"><span>Home</span><span>Lessons</span><span>Quiz</span><span>Profile</span></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC2Rm7ft59D7whGK_ff59Z8hb1EvrL5bGA",
+  authDomain: "learn-english-morocco.firebaseapp.com",
+  projectId: "learn-english-morocco",
+  storageBucket: "learn-english-morocco.firebasestorage.app",
+  messagingSenderId: "306088785225",
+  appId: "1:306088785225:web:d1256f724ff43742179698"
+};
+try{ firebase.initializeApp(firebaseConfig); }catch(e){}
+
+const auth = firebase.auth();
+function login(){
+  const p = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(e=>{
+    document.getElementById('err').innerText = e.message;
+    // إلا كان التيليفون كيبلوكي Popup، غادي يجرب Redirect
+    if(e.code==='auth/popup-blocked') auth.signInWithRedirect(p);
+  });
+}
+function logout(){ auth.signOut(); }
+function show(t,txt){
+  const l=document.getElementById('lesson');
+  l.style.display='block'; l.innerHTML='<b>'+t+'</b><br><br>'+txt;
+  l.scrollIntoView({behavior:'smooth'});
+}
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('login').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('hello').innerText = 'أهلا، ' + (user.displayName || 'صديقي') + '!';
+    document.getElementById('email').innerText = user.email;
+    if(user.photoURL) document.getElementById('photo').src = user.photoURL;
+  } else {
+    document.getElementById('login').style.display='block';
+    document.getElementById('app').style.display='none';
+  }
+});
+</script>
+</body>
+</html>
